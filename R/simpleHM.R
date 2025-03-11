@@ -44,7 +44,6 @@ simpleHM <- function(df,
                   param_order = NULL, # if the parameters are not clustered, you can supply a custom order
                   linkage = "complete", #what linkage method for clustering
 
-
                   show_sample_names = T, #show the sample names
 
                   normalise_params = T,  # normalisation across parameters (z-score)
@@ -54,12 +53,10 @@ simpleHM <- function(df,
                   excluded_vars = c(), # numeric variables included as columns which are not to be included in the heatmap(i.e. batch 1,2,3)
                   id_col = "", # column identifying each sample, defaults to first colum if empty
 
-
                   color_code = c(high = "#FF1c00", low = "darkblue"), # color code for the heatmap
                   custom_threshold = NULL, #custom threshold for z-score
                   outlier.removal = T, # should the zscore be cleared of outliers (outliers are set to the percentile detailed below)
                   outlier.threshold = 0.95, # want percentile of z-scores should be trimmed
-
 
                   add_annotation = F, # should color bar annotation be included?
                   anno_col = "", # which columns contains annotations, defaults to everything but the identifier or the not excluded numeric columns
