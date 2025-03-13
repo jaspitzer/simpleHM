@@ -23,6 +23,7 @@ simpleHM(
   add_annotation = F,
   anno_col = "",
   annotation_colors = list(),
+  add_dendros = F,
   .plot = T,
   return_list = F
 )
@@ -63,6 +64,8 @@ simpleHM(
 \item{anno_col}{which columns is the data contain annotation? can be a character vector.}
 
 \item{annotation_colors}{a list containing the vectors with colors for every annotation column}
+
+\item{add_dendros}{should dendros be added}
 
 \item{.plot}{should the plot be created and returned? default is T, if F just returns the data}
 

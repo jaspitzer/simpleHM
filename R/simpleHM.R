@@ -18,6 +18,7 @@
 #' @param add_annotation should annotation be added to the heatmap? default = F
 #' @param anno_col which columns is the data contain annotation? can be a character vector.
 #' @param annotation_colors a list containing the vectors with colors for every annotation column
+#' @param add_dendros should dendros be added
 #' @param .plot should the plot be created and returned? default is T, if F just returns the data
 #' @param return_list when adding annotation, should the assembled plot be returned? or should the components be returned as a list? defaults to F
 #'
@@ -61,12 +62,14 @@ simpleHM <- function(df,
                   add_annotation = F, # should color bar annotation be included?
                   anno_col = "", # which columns contains annotations, defaults to everything but the identifier or the not excluded numeric columns
                   annotation_colors = list(), # list of color vectors, expects one for every anno col
+                  
+                  add_dendros = F, # should dendrograms be added? T/F
 
                   .plot = T, # should a plot be generated or only the data frame be returned
                   return_list = F # if a plot is generated, should it be returned as a plot or as a list of subplots
 ){
   df_input <- df
-
+  
   if(normalise_params) { #normalise params
     df_input <- df_input %>%
       {if(norm_method == "zscore")
@@ -74,10 +77,10 @@ simpleHM <- function(df,
         else .} %>%
       {if(norm_method == "max")
         dplyr::mutate(., dplyr::across(.cols = dplyr::where(is.numeric) & !excluded_vars,
-                         function(x){(x-min(x))/(max(x)-min(x))}))
+                                       function(x){(x-min(x))/(max(x)-min(x))}))
         else .}
-
-
+    
+    
   }
   if(normalise_samples){ #normalize samples
     df_input <- df_input %>%
@@ -100,63 +103,34 @@ simpleHM <- function(df,
   }
   message("normalisation done")
   if(clust_samples){
-    samples_rec <- recipes::recipe(~., data = df_input) %>%
+    samples_clust <- df_input %>% 
       {if(length(excluded_vars) >0)
-        recipes::step_rm(., excluded_vars)
-        else .} %>%
-      recipes::step_rm(-c(recipes::all_numeric_predictors()))
-
-
-    samples_wf <- workflows::workflow() %>%
-      workflows::add_recipe(samples_rec) %>%
-      workflows::add_model(tidyclust::hier_clust(linkage_method = linkage))
-
-    samples_fit <- samples_wf %>%
-      tidyclust::fit(data = df_input)
-
-    samples_fit <- samples_fit %>%
-      tune::extract_fit_engine()
-
-    order_samples <-samples_fit$order
-
-
-
-    message("clustering samples done")}
-
-
+        dplyr::select(., -tidyselect::any_of(excluded_vars))
+        else .} %>% 
+      tibble::column_to_rownames(ifelse(nchar(id_col) > 0, id_col, names(df)[1])) %>% 
+      dplyr::select(tidyselect::where(base::is.numeric)) %>% 
+      stats::dist() %>% 
+      stats::hclust()
+    
+    order_samples <- samples_clust$labels[samples_clust$order]
+    message("clustering samples done")
+  }
+  
+  
   if(clust_params){
-    df_input_mod <- df_input %>%
-      dplyr::select(ifelse(nchar(id_col) > 0, id_col, names(df_input)[1]),dplyr::where(is.numeric), -excluded_vars) %>%
-      tidyr::pivot_longer(cols =  dplyr::where(is.numeric) & !excluded_vars,
-                   names_to = "params",
-                   values_to = "val") %>%
-      tidyr::pivot_wider(names_from = ifelse(nchar(id_col) > 0, id_col, names(df)[1]),
-                  values_from = "val")
-
-
-    params_rec <- recipes::recipe(~., data = df_input_mod) %>%
-      {if(length(excluded_vars) >0) recipes::step_rm(., excluded_vars) else .} %>%
-      recipes::step_rm(-c(recipes::all_numeric_predictors()))
-
-    params_wf <- workflows::workflow() %>%
-      workflows::add_recipe(params_rec) %>%
-      workflows::add_model(tidyclust::hier_clust(linkage_method = linkage))
-
-    params_fit <- params_wf %>%
-      tidyclust::fit(data = df_input_mod)
-
-
-
-    params_fit <- params_fit %>%
-      tune::extract_fit_engine()
-
-    order_params <- params_fit$order
-
-
-
+    params_clust <- df_input %>% 
+      {if(length(excluded_vars) >0)
+        dplyr::select(., -tidyselect::any_of(excluded_vars))
+        else .} %>% 
+      tibble::column_to_rownames(ifelse(nchar(id_col) > 0, id_col, names(df)[1])) %>% 
+      dplyr::select(tidyselect::where(is.numeric)) %>% 
+      t() %>% 
+      stats::dist() %>% 
+      stats::hclust()
+    
+    order_params <- params_clust$labels[params_clust$order]
     message("clustering params done")
   }
-
 
 
   if(is.numeric(custom_threshold) & norm_method == "zscore"){
@@ -205,15 +179,14 @@ simpleHM <- function(df,
   }
 
 
-message("test")
   df_plot <- df_plot %>%
     {if(nchar(id_col) > 0) dplyr::rename(.,"SAMPLE" = id_col)  else dplyr::rename(.,"SAMPLE" = 1)}
 
   df_plot <- df_plot %>%
     dplyr::mutate(SAMPLE = forcats::as_factor(SAMPLE),
            params = forcats::as_factor(params)) %>%
-    {if (clust_params) dplyr::mutate(., params = forcats::fct_relevel(params, levels(params)[order_params])) else . } %>%
-    {if (clust_samples) dplyr::mutate(., SAMPLE = forcats::fct_relevel(SAMPLE, levels(SAMPLE)[order_samples])) else . } %>%
+    {if (clust_params) dplyr::mutate(., params = forcats::fct_relevel(params, order_params)) else . } %>%
+    {if (clust_samples) dplyr::mutate(., SAMPLE = forcats::fct_relevel(SAMPLE, order_samples)) else . } %>%
     {if (!clust_params & !is.null(param_order)) dplyr::mutate(., params = forcats::fct_relevel(params, param_order)) else . }
 
   if(.plot){
@@ -268,10 +241,9 @@ message("test")
           dplyr::select(-c(SAMPLE, params, val)) %>% names()
       }
 
-
       for(col in 1:length(anno_cols)){
         anno <- df_plot %>%
-          ggplot2::ggplot(ggplot2::aes(y = 1, x = SAMPLE, fill = ggplot2::.data[[anno_cols[col]]]))+
+          ggplot2::ggplot(ggplot2::aes_string(y = 1, x = "SAMPLE", fill = anno_cols[col])) +
           ggplot2::geom_tile()+
           ggplot2::scale_y_discrete(breaks = seq(from = 0, to = 1, by = 0.25), labels = rep("", 5))+
           {if(length(annotation_colors) >= col && is.character(annotation_colors[[col]]))
@@ -280,23 +252,70 @@ message("test")
           ggplot2::theme(legend.position = "bottom")
         plot_list <- purrr::prepend(plot_list, list(anno))
       }
-
-
-
+      
+      
+      
       if(return_list) {
         return(plot_list)
       }
-
+      
       message("wrapping plots up")
       plot <- patchwork::wrap_plots(plot_list, heights = c(rep(0.05, length(anno_cols)), 1), ncol = 1, guides = "collect")
-
-
+      
+      if(add_dendros){
+        p_top_denro <- ggdendro::ggdendrogram(samples_clust)+
+          ggplot2::theme_void()
+        p_side_denro <- ggdendro::ggdendrogram(params_clust, rotate = T)+
+          ggplot2::scale_y_reverse()+
+          ggplot2::scale_x_discrete(breaks = seq(from = 0, to = 1, length.out = length(order_params)), labels = rep("", length(order_params)))+
+          ggplot2::theme_void()
+        
+        plot_list <- purrr::prepend(plot_list, list(p_top_denro))
+        plot_list <- purrr::prepend(plot_list, list(p_side_denro))
+        
+        for(col in 1:(length(anno_cols)+1)){
+          p_space <- patchwork::plot_spacer()
+          plot_list <- purrr::prepend(plot_list, list(p_space))
+        }
+        plot <- patchwork::wrap_plots(plot_list, 
+                                      heights = c(0.5, rep(0.05, length(anno_cols)), 1),
+                                      widths = c(0.5, 1), ncol = 2, byrow = F, guides = "collect")
+        
+        return(plot)
+        ##stuff
+      }
+      
+      
       return(plot)
     }else{
+      if(add_dendros){
+        plot_list <- list(hm)
+        p_top_denro <- ggdendro::ggdendrogram(samples_clust)+
+          ggplot2::theme_void()
+        p_side_denro <- ggdendro::ggdendrogram(params_clust, rotate = T)+
+          ggplot2::scale_y_reverse()+
+          ggplot2::scale_x_discrete(breaks = seq(from = 0, to = 1, length.out = length(order_params)), labels = rep("", length(order_params)))+
+          ggplot2::theme_void()
+        
+        plot_list <- purrr::prepend(plot_list, list(p_top_denro))
+        plot_list <- purrr::prepend(plot_list, list(p_side_denro))
+        
+        p_space <- patchwork::plot_spacer()
+        plot_list <- purrr::prepend(plot_list, list(p_space))
+        
+        plot <- patchwork::wrap_plots(plot_list, 
+                                      heights = c(0.5, 1),
+                                      widths = c(0.5, 1), ncol = 2, byrow = F, guides = "collect")
+        
+        return(plot)
+        ##stuff
+      }
+      
+      
       return(hm)
     }
-
-
+    
+    
   }else{
     return(df_plot)
   }
