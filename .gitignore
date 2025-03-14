@@ -1,3 +1,6 @@
 *.Rproj
 *.Rproj*
 rmd_files/*
+.Rhistory
+.Rbuildignore
+.Rpoj.user/*
