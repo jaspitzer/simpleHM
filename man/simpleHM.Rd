@@ -10,6 +10,8 @@ simpleHM(
   clust_params = T,
   param_order = NULL,
   linkage = "complete",
+  pull_top = NULL,
+  pull_side = NULL,
   show_sample_names = T,
   normalise_params = T,
   normalise_samples = F,
@@ -38,6 +40,10 @@ simpleHM(
 \item{param_order}{can be used to suplly a vector containg a custom order for the variables. Ignored if clust_params = TRUE}
 
 \item{linkage}{which linkage method to use. defaults}
+
+\item{pull_top}{should the dendrogram be rotated? if yes, what levels should be pulled to the front? Accepts numeric values (current order) and variable names}
+
+\item{pull_side}{should the dendrogram be rotated? if yes, what levels should be pulled to the front? Accepts numeric values (current order) and variable names}
 
 \item{show_sample_names}{should the sample names be shown in the heatmap?}
 

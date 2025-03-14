@@ -5,6 +5,8 @@
 #' @param clust_params should the variables be clustered? T/F
 #' @param param_order can be used to suplly a vector containg a custom order for the variables. Ignored if clust_params = TRUE
 #' @param linkage which linkage method to use. defaults
+#' @param pull_top should the dendrogram be rotated? if yes, what levels should be pulled to the front? Accepts numeric values (current order) and variable names
+#' @param pull_side should the dendrogram be rotated? if yes, what levels should be pulled to the front? Accepts numeric values (current order) and variable names
 #' @param show_sample_names should the sample names be shown in the heatmap?
 #' @param normalise_params should the variables be normalized? defaults to T
 #' @param normalise_samples should normalisation be applied to samples? defaults to F
@@ -44,6 +46,8 @@ simpleHM <- function(df,
                   clust_params = T, # should the parameters (rows) be clustered
                   param_order = NULL, # if the parameters are not clustered, you can supply a custom order
                   linkage = "complete", #what linkage method for clustering
+                  pull_top = NULL,
+                  pull_side = NULL,
 
                   show_sample_names = T, #show the sample names
 
@@ -113,6 +117,17 @@ simpleHM <- function(df,
       stats::hclust()
     
     order_samples <- samples_clust$labels[samples_clust$order]
+    if(!is.null(pull_top)){
+      if(is.numeric(pull_top)){
+        order_samples <- samples_clust$labels[samples_clust$order] %>% forcats::fct_inorder() %>% forcats::fct_relevel(samples_clust$labels[samples_clust$order[pull_top]]) %>% levels()
+        samples_clust <- dendextend::rotate(samples_clust, order_samples)
+      }
+      if(is.character(pull_top)){
+        order_samples <- samples_clust$labels[samples_clust$order] %>% forcats::fct_inorder() %>% forcats::fct_relevel(pull_top) %>% levels()
+        samples_clust <- dendextend::rotate(samples_clust, order_samples)
+      }
+    }
+    
     message("clustering samples done")
   }
   
@@ -129,8 +144,21 @@ simpleHM <- function(df,
       stats::hclust()
     
     order_params <- params_clust$labels[params_clust$order]
+    
+    if(!is.null(pull_side)){
+      if(is.numeric(pull_side)){
+        order_params <- params_clust$labels[params_clust$order] %>% forcats::fct_inorder() %>% forcats::fct_relevel(params_clust$labels[params_clust$order[pull_side]]) %>% levels()
+        params_clust <- dendextend::rotate(params_clust, order_params)
+      }
+      if(is.character(pull_side)){
+        order_params <- params_clust$labels[params_clust$order] %>% forcats::fct_inorder() %>% forcats::fct_relevel(pull_side) %>% levels()
+        params_clust <- dendextend::rotate(params_clust, order_params)
+      }
+    }
     message("clustering params done")
   }
+  
+  
 
 
   if(is.numeric(custom_threshold) & norm_method == "zscore"){
