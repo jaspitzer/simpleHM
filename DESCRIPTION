@@ -1,11 +1,12 @@
 Package: simpleHM
 Type: Package
-Title: Create Heatmaps
-Version: 0.1.1
-Author: Jasper Spitzer
-Maintainer: Jasper Spitzer <spitzer@uni-bonn.de>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Title: Create ggplot2 based Heatmaps
+Version: 0.2.1
+Authors@R: person("Jasper", "Spitzer", email = "spitzer@uni-bonn.de",
+  role = c("aut", "cre"),
+  comment = c(ORCID = "0000-0001-9696-2092"))
+Description: The package is designed to build heatmaps, mostly in the context of high-troughput data.     
+    It utilises the tidyverse packages heavily and returns a ggplopt object, with all the functionality that comes with it.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
