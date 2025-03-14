@@ -13,6 +13,7 @@ simpleHM(
   pull_top = NULL,
   pull_side = NULL,
   show_sample_names = T,
+  show_param_names = T,
   normalise_params = T,
   normalise_samples = F,
   norm_method = "zscore",
@@ -46,6 +47,8 @@ simpleHM(
 \item{pull_side}{should the dendrogram be rotated? if yes, what levels should be pulled to the front? Accepts numeric values (current order) and variable names}
 
 \item{show_sample_names}{should the sample names be shown in the heatmap?}
+
+\item{show_param_names}{should the parameter names be shown in the heatmap?}
 
 \item{normalise_params}{should the variables be normalized? defaults to T}
 

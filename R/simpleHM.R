@@ -8,6 +8,7 @@
 #' @param pull_top should the dendrogram be rotated? if yes, what levels should be pulled to the front? Accepts numeric values (current order) and variable names
 #' @param pull_side should the dendrogram be rotated? if yes, what levels should be pulled to the front? Accepts numeric values (current order) and variable names
 #' @param show_sample_names should the sample names be shown in the heatmap?
+#' @param show_param_names should the parameter names be shown in the heatmap?
 #' @param normalise_params should the variables be normalized? defaults to T
 #' @param normalise_samples should normalisation be applied to samples? defaults to F
 #' @param norm_method which method should be applied to normalise? can be min/max scaling or z-score; T/F
@@ -48,8 +49,9 @@ simpleHM <- function(df,
                   linkage = "complete", #what linkage method for clustering
                   pull_top = NULL,
                   pull_side = NULL,
-
+                  
                   show_sample_names = T, #show the sample names
+                  show_param_names = T, #show the sample names
 
                   normalise_params = T,  # normalisation across parameters (z-score)
                   normalise_samples = F, # normalisation across samples
@@ -237,14 +239,18 @@ simpleHM <- function(df,
       ggplot2::theme(axis.title.x = ggplot2::element_blank(),
             axis.title.y = ggplot2::element_blank(),
             axis.ticks.y = ggplot2::element_blank(),
+            axis.text.x = ggplot2::element_text(hjust = 1, angle = 90),
+            axis.text.y = ggplot2::element_text(),
             legend.position = "right")+
       {if(length(unique(df_plot$params)) > 100)
+        ggplot2::theme(axis.text.y = ggplot2::element_blank())}+
+      {if(!show_param_names)
         ggplot2::theme(axis.text.y = ggplot2::element_blank())}+
       {if(!show_sample_names)
         ggplot2::theme(axis.text.x = ggplot2::element_blank(),
               axis.ticks.x = ggplot2::element_blank())
         else if(length(unique(df_plot$SAMPLE)) > 50)
-          ggplot2::theme(axis.text.x = ggplot2::element_text(hjust = 1, angle = 90))}+
+          ggplot2::theme(axis.text.x = ggplot2::element_blank())}+
       {if(norm_method == "zscore") ggplot2::labs(fill = "z-score norm.\nmRNA expression")}+
       {if(norm_method == "max") ggplot2::labs(fill = "Maximum scaled\nmRNA expression")}
 
