@@ -77,7 +77,8 @@ p2 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_top = 7:12)
 p3 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_side = 3:4)
 p4 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_side = c("var1", "var3"))
 
-patchwork::wrap_plots(p1, p2, p3, p4, guides = "collect", ncol = 2)
+combined_plots <- patchwork::wrap_plots(p1, p2, p3, p4, guides = "collect", ncol = 2)
+combined_plots
 ```
 
 

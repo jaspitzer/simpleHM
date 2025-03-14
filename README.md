@@ -35,12 +35,12 @@ df <- data.frame(samples = c(paste0("untreated", 1:6), paste0("treated", 7:12)),
 
 head(df)
 #>      samples     group  patient batch      var1      var2     var3      var4
-#> 1 untreated1 Untreated Patient1     1  8.860087  9.576637 54.89087  8.136007
-#> 2 untreated2 Untreated Patient2     2 10.270228 10.350721 41.93481  9.870465
-#> 3 untreated3 Untreated Patient3     1  9.745679 11.950407 49.93015 10.260266
-#> 4 untreated4 Untreated Patient1     2 11.278134 10.366831 51.77163 10.302243
-#> 5 untreated5 Untreated Patient2     1 11.842896 10.449707 51.88338 10.955875
-#> 6 untreated6 Untreated Patient3     2  9.784406 11.261815 53.28463 10.889926
+#> 1 untreated1 Untreated Patient1     1  8.927879  9.751583 47.86399  9.396543
+#> 2 untreated2 Untreated Patient2     2  9.216838  9.284323 45.87959  7.788124
+#> 3 untreated3 Untreated Patient3     1 11.298714  9.744121 43.88606  8.075569
+#> 4 untreated4 Untreated Patient1     2 10.101002 10.306085 46.04717  8.700804
+#> 5 untreated5 Untreated Patient2     1  9.178411 10.334551 54.46727 10.248702
+#> 6 untreated6 Untreated Patient3     2 10.076768 11.278322 46.62077  7.950546
 
 heatmap_plot <- simpleHM(df, excluded_vars = "batch")    
 #> normalisation done
@@ -150,7 +150,8 @@ p4 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_side = c("var1
 #> Adding another scale for y, which will replace the existing scale.Scale for x is already present.
 #> Adding another scale for x, which will replace the existing scale.
 
-patchwork::wrap_plots(p1, p2, p3, p4, guides = "collect", ncol = 2)
+combined_plots <- patchwork::wrap_plots(p1, p2, p3, p4, guides = "collect", ncol = 2)
+combined_plots
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
