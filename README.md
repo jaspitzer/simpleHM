@@ -35,12 +35,12 @@ df <- data.frame(samples = c(paste0("untreated", 1:6), paste0("treated", 7:12)),
 
 head(df)
 #>      samples     group  patient batch      var1      var2     var3      var4
-#> 1 untreated1 Untreated Patient1     1  9.635496  8.702448 47.30708 11.230937
-#> 2 untreated2 Untreated Patient2     2  9.383444 10.441290 46.90473  7.574859
-#> 3 untreated3 Untreated Patient3     1 10.105569  9.703693 49.90321 10.155978
-#> 4 untreated4 Untreated Patient1     2 10.785015 11.712117 51.88102  6.910724
-#> 5 untreated5 Untreated Patient2     1 10.971016 10.692509 41.26765 10.584639
-#> 6 untreated6 Untreated Patient3     2 11.318634 10.336982 37.23171  9.487518
+#> 1 untreated1 Untreated Patient1     1  8.860087  9.576637 54.89087  8.136007
+#> 2 untreated2 Untreated Patient2     2 10.270228 10.350721 41.93481  9.870465
+#> 3 untreated3 Untreated Patient3     1  9.745679 11.950407 49.93015 10.260266
+#> 4 untreated4 Untreated Patient1     2 11.278134 10.366831 51.77163 10.302243
+#> 5 untreated5 Untreated Patient2     1 11.842896 10.449707 51.88338 10.955875
+#> 6 untreated6 Untreated Patient3     2  9.784406 11.261815 53.28463 10.889926
 
 heatmap_plot <- simpleHM(df, excluded_vars = "batch")    
 #> normalisation done
@@ -116,7 +116,7 @@ distance between branches. For this purpose, the `pull_top` and
 through rotation along the branches of the tree.
 
 ``` r
-simpleHM(df, excluded_vars = "batch", add_dendros = T )
+p1 <- simpleHM(df, excluded_vars = "batch", add_dendros = T )
 #> normalisation done
 #> clustering samples done
 #> clustering params done
@@ -125,48 +125,35 @@ simpleHM(df, excluded_vars = "batch", add_dendros = T )
 #> Adding another scale for y, which will replace the existing scale.
 #> Scale for x is already present.
 #> Adding another scale for x, which will replace the existing scale.
+p2 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_top = 7:12)
+#> normalisation done
+#> clustering samples done
+#> clustering params done
+#> plotting now
+#> Scale for y is already present.
+#> Adding another scale for y, which will replace the existing scale.Scale for x is already present.
+#> Adding another scale for x, which will replace the existing scale.
+p3 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_side = 3:4)
+#> normalisation done
+#> clustering samples done
+#> clustering params done
+#> plotting now
+#> Scale for y is already present.
+#> Adding another scale for y, which will replace the existing scale.Scale for x is already present.
+#> Adding another scale for x, which will replace the existing scale.
+p4 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_side = c("var1", "var3"))
+#> normalisation done
+#> clustering samples done
+#> clustering params done
+#> plotting now
+#> Scale for y is already present.
+#> Adding another scale for y, which will replace the existing scale.Scale for x is already present.
+#> Adding another scale for x, which will replace the existing scale.
+
+patchwork::wrap_plots(p1, p2, p3, p4, guides = "collect", ncol = 2)
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
-
-``` r
-simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_top = 7:12)
-#> normalisation done
-#> clustering samples done
-#> clustering params done
-#> plotting now
-#> Scale for y is already present.
-#> Adding another scale for y, which will replace the existing scale.Scale for x is already present.
-#> Adding another scale for x, which will replace the existing scale.
-```
-
-<img src="man/figures/README-unnamed-chunk-5-2.png" width="100%" />
-
-``` r
-simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_side = 3:4)
-#> normalisation done
-#> clustering samples done
-#> clustering params done
-#> plotting now
-#> Scale for y is already present.
-#> Adding another scale for y, which will replace the existing scale.Scale for x is already present.
-#> Adding another scale for x, which will replace the existing scale.
-```
-
-<img src="man/figures/README-unnamed-chunk-5-3.png" width="100%" />
-
-``` r
-simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_side = c("var1", "var3"))
-#> normalisation done
-#> clustering samples done
-#> clustering params done
-#> plotting now
-#> Scale for y is already present.
-#> Adding another scale for y, which will replace the existing scale.Scale for x is already present.
-#> Adding another scale for x, which will replace the existing scale.
-```
-
-<img src="man/figures/README-unnamed-chunk-5-4.png" width="100%" />
 
 These options can also be combined:
 
