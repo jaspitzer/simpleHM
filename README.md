@@ -35,13 +35,13 @@ df <- data.frame(samples = c(paste0("untreated", 1:6), paste0("treated", 7:12)),
                  var4 = c(rnorm(6, 10, 1),  rnorm(6, 60, .7)))
 
 head(df)
-#>      samples     group  patient batch     var1      var2     var3      var4
-#> 1 untreated1 Untreated Patient1     1 10.10423 11.501308 56.37941  9.179734
-#> 2 untreated2 Untreated Patient2     2 10.86695  8.427591 54.16615 11.389776
-#> 3 untreated3 Untreated Patient3     1 10.01976  9.510030 41.26797  9.350953
-#> 4 untreated4 Untreated Patient1     2 10.23832 11.216166 55.85022 10.308983
-#> 5 untreated5 Untreated Patient2     1 11.77084 10.192072 45.74605  9.220261
-#> 6 untreated6 Untreated Patient3     2 10.55971  9.234998 50.49691  9.407339
+#>      samples     group  patient batch      var1      var2     var3      var4
+#> 1 untreated1 Untreated Patient1     1 10.383453  9.287492 45.79169 11.583357
+#> 2 untreated2 Untreated Patient2     2 10.075931 10.270500 45.01411  7.953078
+#> 3 untreated3 Untreated Patient3     1 10.483314 10.710035 54.10228 11.249119
+#> 4 untreated4 Untreated Patient1     2  9.900946  8.954973 52.03374  8.690800
+#> 5 untreated5 Untreated Patient2     1 10.404475  7.736143 44.07323 10.329316
+#> 6 untreated6 Untreated Patient3     2  9.720149  9.675822 42.67871 10.274727
 
 heatmap_plot <- simpleHM(df, excluded_vars = "batch")    
 #> normalisation done
@@ -154,8 +154,8 @@ p4 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_side = c("var1
 #> Adding another scale for y, which will replace the existing scale.Scale for x is already present.
 #> Adding another scale for x, which will replace the existing scale.
 
-combined_plots1 <- p1 | p2
-combined_plots2 <- p3 | p4
+combined_plots1 <- wrap_plots(list(p1, p2), ncol = 2) & ggplot2::theme(legend.position = "none")
+combined_plots2 <- wrap_plots(list(p3, p4), ncol = 2, guides = "collect")
 
 combined_plots1
 ```
