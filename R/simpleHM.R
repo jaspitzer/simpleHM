@@ -9,6 +9,7 @@
 #' @param pull_side should the dendrogram be rotated? if yes, what levels should be pulled to the front? Accepts numeric values (current order) and variable names
 #' @param show_sample_names should the sample names be shown in the heatmap?
 #' @param show_param_names should the parameter names be shown in the heatmap?
+#' @param hide_legend Should the legend be hidden? Default is FALSE
 #' @param normalise_params should the variables be normalized? defaults to T
 #' @param normalise_samples should normalisation be applied to samples? defaults to F
 #' @param norm_method which method should be applied to normalise? can be min/max scaling or z-score; T/F
@@ -52,6 +53,7 @@ simpleHM <- function(df,
                   
                   show_sample_names = T, #show the sample names
                   show_param_names = T, #show the sample names
+                  hide_legend = F,
 
                   normalise_params = T,  # normalisation across parameters (z-score)
                   normalise_samples = F, # normalisation across samples
@@ -252,7 +254,8 @@ simpleHM <- function(df,
         else if(length(unique(df_plot$SAMPLE)) > 50)
           ggplot2::theme(axis.text.x = ggplot2::element_blank())}+
       {if(norm_method == "zscore") ggplot2::labs(fill = "z-score norm.\nmRNA expression")}+
-      {if(norm_method == "max") ggplot2::labs(fill = "Maximum scaled\nmRNA expression")}
+      {if(norm_method == "max") ggplot2::labs(fill = "Maximum scaled\nmRNA expression")}+
+      {if(hide_legend) ggplot2::theme(legend.position = "none")}
 
 
 

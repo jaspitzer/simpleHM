@@ -14,6 +14,7 @@ simpleHM(
   pull_side = NULL,
   show_sample_names = T,
   show_param_names = T,
+  hide_legend = F,
   normalise_params = T,
   normalise_samples = F,
   norm_method = "zscore",
@@ -49,6 +50,8 @@ simpleHM(
 \item{show_sample_names}{should the sample names be shown in the heatmap?}
 
 \item{show_param_names}{should the parameter names be shown in the heatmap?}
+
+\item{hide_legend}{Should the legend be hidden? Default is FALSE}
 
 \item{normalise_params}{should the variables be normalized? defaults to T}
 

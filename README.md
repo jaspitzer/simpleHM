@@ -36,12 +36,12 @@ df <- data.frame(samples = c(paste0("untreated", 1:6), paste0("treated", 7:12)),
 
 head(df)
 #>      samples     group  patient batch      var1      var2     var3      var4
-#> 1 untreated1 Untreated Patient1     1  8.891739  9.220799 57.41239 10.088072
-#> 2 untreated2 Untreated Patient2     2 10.737352  8.458915 57.92662 10.885514
-#> 3 untreated3 Untreated Patient3     1 11.001549 10.176619 49.35026  9.854329
-#> 4 untreated4 Untreated Patient1     2  9.719786 11.301982 42.28681 10.444724
-#> 5 untreated5 Untreated Patient2     1  9.721286  9.080322 51.96233  9.700775
-#> 6 untreated6 Untreated Patient3     2 10.996322 10.454314 48.94407 10.340856
+#> 1 untreated1 Untreated Patient1     1  9.491640 11.029656 50.52822 10.278410
+#> 2 untreated2 Untreated Patient2     2  9.188199 10.286068 50.31340  8.820163
+#> 3 untreated3 Untreated Patient3     1 10.126060 11.161845 49.13559  8.994447
+#> 4 untreated4 Untreated Patient1     2 10.256182  8.855773 39.98354 11.394917
+#> 5 untreated5 Untreated Patient2     1  9.773227  8.737668 53.70204  9.250893
+#> 6 untreated6 Untreated Patient3     2 11.515521 11.070132 53.48965  9.260924
 
 heatmap_plot <- simpleHM(df, excluded_vars = "batch")    
 #> normalisation done
@@ -120,7 +120,7 @@ through rotation along the branches of the tree.
 
 
 library(patchwork)
-p1 <- simpleHM(df, excluded_vars = "batch", add_dendros = T )
+p1 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, hide_legend = T)
 #> normalisation done
 #> clustering samples done
 #> clustering params done
@@ -129,7 +129,7 @@ p1 <- simpleHM(df, excluded_vars = "batch", add_dendros = T )
 #> Adding another scale for y, which will replace the existing scale.
 #> Scale for x is already present.
 #> Adding another scale for x, which will replace the existing scale.
-p2 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_top = 7:12)
+p2 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_top = 7:12, hide_legend = T)
 #> normalisation done
 #> clustering samples done
 #> clustering params done
@@ -137,7 +137,7 @@ p2 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_top = 7:12)
 #> Scale for y is already present.
 #> Adding another scale for y, which will replace the existing scale.Scale for x is already present.
 #> Adding another scale for x, which will replace the existing scale.
-p3 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_side = 3:4)
+p3 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_side = 3:4, hide_legend = T)
 #> normalisation done
 #> clustering samples done
 #> clustering params done
@@ -145,7 +145,7 @@ p3 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_side = 3:4)
 #> Scale for y is already present.
 #> Adding another scale for y, which will replace the existing scale.Scale for x is already present.
 #> Adding another scale for x, which will replace the existing scale.
-p4 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_side = c("var1", "var3"))
+p4 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_side = c("var1", "var3"), hide_legend = T)
 #> normalisation done
 #> clustering samples done
 #> clustering params done
