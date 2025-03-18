@@ -300,12 +300,12 @@ simpleHM <- function(df,
       plot <- patchwork::wrap_plots(plot_list, heights = c(rep(0.05, length(anno_cols)), 1), ncol = 1, guides = "collect")
       
       if(add_dendros){
-        p_top_denro <- ggdendro::ggdendrogram(samples_clust)+
-          ggplot2::theme_void()
-        p_side_denro <- ggdendro::ggdendrogram(params_clust, rotate = T)+
-          ggplot2::scale_y_reverse()+
-          ggplot2::scale_x_discrete(breaks = seq(from = 0, to = 1, length.out = length(order_params)), labels = rep("", length(order_params)))+
-          ggplot2::theme_void()
+        suppressMessages(p_top_denro <- ggdendro::ggdendrogram(samples_clust)+
+                           ggplot2::theme_void())
+        suppressMessages(p_side_denro <- ggdendro::ggdendrogram(params_clust, rotate = T)+
+                           ggplot2::scale_y_reverse()+
+                           ggplot2::scale_x_discrete(breaks = seq(from = 0, to = 1, length.out = length(order_params)), labels = rep("", length(order_params)))+
+                           ggplot2::theme_void())
         
         plot_list <- purrr::prepend(plot_list, list(p_top_denro))
         plot_list <- purrr::prepend(plot_list, list(p_side_denro))
@@ -327,12 +327,12 @@ simpleHM <- function(df,
     }else{
       if(add_dendros){
         plot_list <- list(hm)
-        p_top_denro <- ggdendro::ggdendrogram(samples_clust)+
-          ggplot2::theme_void()
-        p_side_denro <- ggdendro::ggdendrogram(params_clust, rotate = T)+
-          ggplot2::scale_y_reverse()+
-          ggplot2::scale_x_discrete(breaks = seq(from = 0, to = 1, length.out = length(order_params)), labels = rep("", length(order_params)))+
-          ggplot2::theme_void()
+        suppressMessages(p_top_denro <- ggdendro::ggdendrogram(samples_clust)+
+                           ggplot2::theme_void())
+        suppressMessages(p_side_denro <- ggdendro::ggdendrogram(params_clust, rotate = T)+
+                           ggplot2::scale_y_reverse()+
+                           ggplot2::scale_x_discrete(breaks = seq(from = 0, to = 1, length.out = length(order_params)), labels = rep("", length(order_params)))+
+                           ggplot2::theme_void())
         
         plot_list <- purrr::prepend(plot_list, list(p_top_denro))
         plot_list <- purrr::prepend(plot_list, list(p_side_denro))

@@ -95,3 +95,18 @@ annotated_hm_with_dendro <- simpleHM(df, excluded_vars = "batch", add_annotation
 annotated_hm_with_dendro
 ```
 
+You can also generate the separate parts like the heatmap, the dendrogram and the annotation seperately and later combine them in a way you see fit. 
+```{r}
+just_dendros <- simpleDendro(df, excluded_vars = "batch")
+just_dendros
+```
+```{r}
+just_annotations <- simpleAnno(df, excluded_vars = "batch")
+just_annotations
+```
+As a note, the `excluded_vars` argument excludes the (numeric) variable from influence in clustering and normalisation, it does not exclude it from the annotation columns. You can however specify the columns through the `annotation_cols` parameter:
+```{r}
+specific_annotations <- simpleAnno(df, anno_col = c("group", "patient"))
+specific_annotations
+```
+
