@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of simpleHM is to ...
+The goal of simpleHM is to provide a package to generate heatmap visualisations. In contrast to something like the [ComplexHeatmap](https://github.com/jokergoo/ComplexHeatmap/) package, it generates plots using ggplot2 and the tidyverse, allowing for better customisation and integration into existing workflows. 
 
 ## Installation
 

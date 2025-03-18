@@ -6,7 +6,11 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of simpleHM is to …
+The goal of simpleHM is to provide a package to generate heatmap
+visualisations. In contrast to something like the
+[ComplexHeatmap](https://github.com/jokergoo/ComplexHeatmap/) package,
+it generates plots using ggplot2 and the tidyverse, allowing for better
+customisation and integration into existing workflows.
 
 ## Installation
 
@@ -36,12 +40,12 @@ df <- data.frame(samples = c(paste0("untreated", 1:6), paste0("treated", 7:12)),
 
 head(df)
 #>      samples     group  patient batch      var1      var2     var3      var4
-#> 1 untreated1 Untreated Patient1     1 10.503050 10.347042 50.68064  9.169438
-#> 2 untreated2 Untreated Patient2     2 10.880663  8.937040 55.38670 10.763202
-#> 3 untreated3 Untreated Patient3     1  8.624365  8.497992 56.53160  7.617076
-#> 4 untreated4 Untreated Patient1     2  8.183576 11.835800 56.09138  9.927114
-#> 5 untreated5 Untreated Patient2     1 10.656797 11.880149 52.04441  8.445013
-#> 6 untreated6 Untreated Patient3     2 11.007595 10.372460 38.68375 10.470105
+#> 1 untreated1 Untreated Patient1     1 10.080857  9.031367 44.16176 11.945974
+#> 2 untreated2 Untreated Patient2     2  9.652045  9.068599 54.38544  9.530221
+#> 3 untreated3 Untreated Patient3     1 11.320619  8.654449 45.62264  9.005435
+#> 4 untreated4 Untreated Patient1     2  9.906732 12.187999 50.92283 11.006231
+#> 5 untreated5 Untreated Patient2     1  9.854646 10.365214 47.04367 11.655614
+#> 6 untreated6 Untreated Patient3     2 10.386753  9.448740 50.60357  8.606055
 
 heatmap_plot <- simpleHM(df, excluded_vars = "batch")    
 heatmap_plot
