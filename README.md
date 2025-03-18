@@ -35,19 +35,15 @@ df <- data.frame(samples = c(paste0("untreated", 1:6), paste0("treated", 7:12)),
                  var4 = c(rnorm(6, 10, 1),  rnorm(6, 60, .7)))
 
 head(df)
-#>      samples     group  patient batch      var1      var2     var3     var4
-#> 1 untreated1 Untreated Patient1     1  8.885159 10.776769 50.23059 8.275746
-#> 2 untreated2 Untreated Patient2     2 10.156916  9.686976 54.90836 9.144239
-#> 3 untreated3 Untreated Patient3     1 11.343571  8.808912 43.25903 9.971676
-#> 4 untreated4 Untreated Patient1     2 10.443823  8.971469 48.33122 9.269588
-#> 5 untreated5 Untreated Patient2     1 11.294030  9.374669 45.67908 8.053775
-#> 6 untreated6 Untreated Patient3     2 10.520842 10.393519 44.80469 9.319474
+#>      samples     group  patient batch      var1      var2     var3      var4
+#> 1 untreated1 Untreated Patient1     1 10.503050 10.347042 50.68064  9.169438
+#> 2 untreated2 Untreated Patient2     2 10.880663  8.937040 55.38670 10.763202
+#> 3 untreated3 Untreated Patient3     1  8.624365  8.497992 56.53160  7.617076
+#> 4 untreated4 Untreated Patient1     2  8.183576 11.835800 56.09138  9.927114
+#> 5 untreated5 Untreated Patient2     1 10.656797 11.880149 52.04441  8.445013
+#> 6 untreated6 Untreated Patient3     2 11.007595 10.372460 38.68375 10.470105
 
 heatmap_plot <- simpleHM(df, excluded_vars = "batch")    
-#> normalisation done
-#> clustering samples done
-#> clustering params done
-#> plotting now
 heatmap_plot
 ```
 
@@ -59,10 +55,6 @@ You can also hide them by using the `show_sample_names` and
 
 ``` r
 heatmap_plot_no_sample_names <- simpleHM(df, excluded_vars = "batch", show_sample_names = F)    
-#> normalisation done
-#> clustering samples done
-#> clustering params done
-#> plotting now
 heatmap_plot_no_sample_names
 ```
 
@@ -70,10 +62,6 @@ heatmap_plot_no_sample_names
 
 ``` r
 heatmap_plot_no_param_names <- simpleHM(df, excluded_vars = "batch", show_param_names = F)    
-#> normalisation done
-#> clustering samples done
-#> clustering params done
-#> plotting now
 heatmap_plot_no_param_names
 ```
 
@@ -84,12 +72,6 @@ the `add_annotation` parameter:
 
 ``` r
 hm_with_anno <- simpleHM(df, add_annotation = T, anno_col = c("group", "patient"), excluded_vars = "batch")
-#> normalisation done
-#> clustering samples done
-#> clustering params done
-#> plotting now
-#> adding annotation
-#> wrapping plots up
 hm_with_anno
 ```
 
@@ -100,10 +82,6 @@ dendrograms, set `add_dendros=T`.
 
 ``` r
 hm_with_dendro <- simpleHM(df, excluded_vars = "batch", add_dendros = T)
-#> normalisation done
-#> clustering samples done
-#> clustering params done
-#> plotting now
 ```
 
 Dendrograms are a for to visualise hierarchical clustering, but the
@@ -117,30 +95,14 @@ through rotation along the branches of the tree.
 
 library(patchwork)
 p1 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, hide_legend = T)
-#> normalisation done
-#> clustering samples done
-#> clustering params done
-#> plotting now
 p2 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_top = 7:12, hide_legend = T)
-#> normalisation done
-#> clustering samples done
-#> clustering params done
-#> plotting now
 p3 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_side = 3:4, hide_legend = T)
-#> normalisation done
-#> clustering samples done
-#> clustering params done
-#> plotting now
 p4 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_side = c("var1", "var3"), hide_legend = T)
-#> normalisation done
-#> clustering samples done
-#> clustering params done
-#> plotting now
 
 combined_plots1 <- wrap_plots(list(p1, p2), ncol = 2)
 combined_plots2 <- wrap_plots(list(p3, p4), ncol = 2)
 
-combined_plots1
+combined_plots1 
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
@@ -155,12 +117,6 @@ These options can also be combined:
 
 ``` r
 annotated_hm_with_dendro <- simpleHM(df, excluded_vars = "batch", add_annotation = T, anno_col = c("group", "patient"), add_dendros = T)
-#> normalisation done
-#> clustering samples done
-#> clustering params done
-#> plotting now
-#> adding annotation
-#> wrapping plots up
 annotated_hm_with_dendro
 ```
 
@@ -172,9 +128,6 @@ you see fit.
 
 ``` r
 just_dendros <- simpleDendro(df, excluded_vars = "batch")
-#> normalisation done
-#> clustering samples done
-#> clustering params done
 just_dendros
 #> $top
 ```
@@ -188,9 +141,6 @@ just_dendros
 
 ``` r
 just_annotations <- simpleAnno(df, excluded_vars = "batch")
-#> normalisation done
-#> clustering samples done
-#> clustering params done
 just_annotations
 #> $batch
 ```
@@ -213,9 +163,6 @@ the annotation columns. You can however specify the columns through the
 
 ``` r
 specific_annotations <- simpleAnno(df, anno_col = c("group", "patient"))
-#> normalisation done
-#> clustering samples done
-#> clustering params done
 specific_annotations
 #> $patient
 ```

@@ -43,82 +43,51 @@
 #' anno_added <- simpleHM(df, add_annotation = TRUE)
 #'
 simpleHM <- function(df,
-
-                  clust_samples = T, # should the samples (columns)  be clustered
-                  clust_params = T, # should the parameters (rows) be clustered
-                  param_order = NULL, # if the parameters are not clustered, you can supply a custom order
-                  linkage = "complete", #what linkage method for clustering
-                  pull_top = NULL,
-                  pull_side = NULL,
-                  
-                  show_sample_names = T, #show the sample names
-                  show_param_names = T, #show the sample names
-                  hide_legend = F,
-
-                  normalise_params = T,  # normalisation across parameters (z-score)
-                  normalise_samples = F, # normalisation across samples
-                  norm_method = "zscore", # which normmilastion to use, zscore or max
-
-                  excluded_vars = c(), # numeric variables included as columns which are not to be included in the heatmap(i.e. batch 1,2,3)
-                  id_col = "", # column identifying each sample, defaults to first colum if empty
-
-                  color_code = c(high = "#FF1c00", low = "darkblue"), # color code for the heatmap
-                  custom_threshold = NULL, #custom threshold for z-score
-                  outlier.removal = T, # should the zscore be cleared of outliers (outliers are set to the percentile detailed below)
-                  outlier.threshold = 0.95, # want percentile of z-scores should be trimmed
-
-                  add_annotation = F, # should color bar annotation be included?
-                  anno_col = "", # which columns contains annotations, defaults to everything but the identifier or the not excluded numeric columns
-                  annotation_colors = list(), # list of color vectors, expects one for every anno col
-                  
-                  add_dendros = F, # should dendrograms be added? T/F
-
-                  .plot = T, # should a plot be generated or only the data frame be returned
-                  return_list = F # if a plot is generated, should it be returned as a plot or as a list of subplots
+                     
+                     clust_samples = T, # should the samples (columns)  be clustered
+                     clust_params = T, # should the parameters (rows) be clustered
+                     param_order = NULL, # if the parameters are not clustered, you can supply a custom order
+                     linkage = "complete", #what linkage method for clustering
+                     pull_top = NULL,
+                     pull_side = NULL,
+                     
+                     show_sample_names = T, #show the sample names
+                     show_param_names = T, #show the sample names
+                     hide_legend = F,
+                     
+                     normalise_params = T,  # normalisation across parameters (z-score)
+                     normalise_samples = F, # normalisation across samples
+                     norm_method = "zscore", # which normmilastion to use, zscore or max
+                     
+                     excluded_vars = c(), # numeric variables included as columns which are not to be included in the heatmap(i.e. batch 1,2,3)
+                     id_col = "", # column identifying each sample, defaults to first colum if empty
+                     
+                     color_code = c(high = "#FF1c00", low = "darkblue"), # color code for the heatmap
+                     custom_threshold = NULL, #custom threshold for z-score
+                     outlier.removal = T, # should the zscore be cleared of outliers (outliers are set to the percentile detailed below)
+                     outlier.threshold = 0.95, # want percentile of z-scores should be trimmed
+                     
+                     add_annotation = F, # should color bar annotation be included?
+                     anno_col = "", # which columns contains annotations, defaults to everything but the identifier or the not excluded numeric columns
+                     annotation_colors = list(), # list of color vectors, expects one for every anno col
+                     
+                     add_dendros = F, # should dendrograms be added? T/F
+                     
+                     .plot = T, # should a plot be generated or only the data frame be returned
+                     return_list = F # if a plot is generated, should it be returned as a plot or as a list of subplots
 ){
-  df_input <- df
+  df_input <- df %>% 
+    {if(nchar(id_col) > 0) dplyr::rename(.,"SAMPLE" = id_col)  else dplyr::rename(.,"SAMPLE" = 1)}
   
   if(normalise_params) { #normalise params
-    df_input <- df_input %>%
-      {if(norm_method == "zscore")
-        dplyr::mutate(., dplyr::across(.cols = dplyr::where(is.numeric) & !excluded_vars, scale))
-        else .} %>%
-      {if(norm_method == "max")
-        dplyr::mutate(., dplyr::across(.cols = dplyr::where(is.numeric) & !excluded_vars,
-                                       function(x){(x-min(x))/(max(x)-min(x))}))
-        else .}
-    
-    
+    df_input <- normalise.params(df_input, norm_method, excluded_vars)
   }
+  
   if(normalise_samples){ #normalize samples
-    df_input <- df_input %>%
-      tidyr::pivot_longer(cols = dplyr::where(is.numeric) & !excluded_vars,
-                   names_to = "params",
-                   values_to = "val") %>%
-      tidyr::pivot_wider(names_from = ifelse(nchar(id_col) > 0, id_col, names(df)[1]),
-                  values_from = "val") %>%
-      {if(norm_method == "zscore")
-        dplyr::mutate(., dplyr::across(.cols = dplyr::where(is.numeric) & !excluded_vars, scale))
-        else .} %>%
-      {if(norm_method == "max")
-        dplyr::mutate(., dplyr::across(.cols = dplyr::where(is.numeric) & !excluded_vars,
-                         function(x){(x-min(x))/(max(x)-min(x))}))
-        else .} %>%
-      tidyr::pivot_longer(cols = dplyr::where(is.numeric) & !excluded_vars,
-                   names_to = ifelse(nchar(id_col) > 0, id_col, names(df)[1]),
-                   values_to = "val") %>%
-      tidyr::pivot_wider(names_from = "params", values_from = "val")
+    df_input <- normalise.samples(df_input, norm_method, excluded_vars)
   }
-  message("normalisation done")
   if(clust_samples){
-    samples_clust <- df_input %>% 
-      {if(length(excluded_vars) >0)
-        dplyr::select(., -tidyselect::any_of(excluded_vars))
-        else .} %>% 
-      tibble::column_to_rownames(ifelse(nchar(id_col) > 0, id_col, names(df)[1])) %>% 
-      dplyr::select(tidyselect::where(base::is.numeric)) %>% 
-      stats::dist() %>% 
-      stats::hclust()
+    samples_clust <- clust.samples(df_input, excluded_vars)
     
     order_samples <- samples_clust$labels[samples_clust$order]
     if(!is.null(pull_top)){
@@ -131,22 +100,11 @@ simpleHM <- function(df,
         samples_clust <- dendextend::rotate(samples_clust, order_samples)
       }
     }
-    
-    message("clustering samples done")
   }
   
   
   if(clust_params){
-    params_clust <- df_input %>% 
-      {if(length(excluded_vars) >0)
-        dplyr::select(., -tidyselect::any_of(excluded_vars))
-        else .} %>% 
-      tibble::column_to_rownames(ifelse(nchar(id_col) > 0, id_col, names(df)[1])) %>% 
-      dplyr::select(tidyselect::where(is.numeric)) %>% 
-      t() %>% 
-      stats::dist() %>% 
-      stats::hclust()
-    
+    params_clust <- clust.params(df_input, excluded_vars)
     order_params <- params_clust$labels[params_clust$order]
     
     if(!is.null(pull_side)){
@@ -159,24 +117,23 @@ simpleHM <- function(df,
         params_clust <- dendextend::rotate(params_clust, order_params)
       }
     }
-    message("clustering params done")
   }
   
   
-
-
+  
+  
   if(is.numeric(custom_threshold) & norm_method == "zscore"){
     df_plot <- df_input %>%
       tidyr::pivot_longer(cols = dplyr::where(is.numeric) & !excluded_vars,
-                   names_to = "params",
-                   values_to = "val")
-
+                          names_to = "params",
+                          values_to = "val")
+    
     df_plot <- df_plot %>%
       dplyr::mutate(val = dplyr::case_when(
         val > custom_threshold ~ custom_threshold,
         val < -custom_threshold ~ -custom_threshold,
         T ~ val))
-
+    
     fill_labels =  round(seq(-custom_threshold, custom_threshold, length.out = 5),2) %>% as.numeric()
     fill_names = c(paste0("< -", custom_threshold),
                    paste0("- ", custom_threshold/2 %>% round(2)),
@@ -186,88 +143,77 @@ simpleHM <- function(df,
   }else if(outlier.removal & norm_method == "zscore"){
     df_plot <- df_input %>%
       tidyr::pivot_longer(cols = dplyr::where(is.numeric) & !excluded_vars,
-                   names_to = "params",
-                   values_to = "val")
-
+                          names_to = "params",
+                          values_to = "val")
+    
     thres <- df_plot$val %>% stats::quantile(probs = outlier.threshold) %>% round(2)
     df_plot <- df_plot %>%
       dplyr::mutate(val = dplyr::case_when(
         val > thres ~ thres,
         val < -thres ~ -thres,
         T ~ val))
-
+    
     fill_labels =  round(seq(-thres, thres, length.out = 5),2) %>% as.numeric()
     fill_names = c(paste0("< -", thres),
                    paste0("- ", thres/2 %>% round(2)),
                    "0",
                    paste0(thres/2 %>% round(2)),
                    paste0("> ", thres))
-
+    
   }else{
     df_plot <- df_input %>%
       tidyr::pivot_longer(cols = dplyr::where(is.numeric) & !excluded_vars,
-                   names_to = "params",
-                   values_to = "val")
+                          names_to = "params",
+                          values_to = "val")
   }
-
-
-  df_plot <- df_plot %>%
-    {if(nchar(id_col) > 0) dplyr::rename(.,"SAMPLE" = id_col)  else dplyr::rename(.,"SAMPLE" = 1)}
-
+  
   df_plot <- df_plot %>%
     dplyr::mutate(SAMPLE = forcats::as_factor(SAMPLE),
-           params = forcats::as_factor(params)) %>%
+                  params = forcats::as_factor(params)) %>%
     {if (clust_params) dplyr::mutate(., params = forcats::fct_relevel(params, order_params)) else . } %>%
     {if (clust_samples) dplyr::mutate(., SAMPLE = forcats::fct_relevel(SAMPLE, order_samples)) else . } %>%
     {if (!clust_params & !is.null(param_order)) dplyr::mutate(., params = forcats::fct_relevel(params, param_order)) else . }
-
+  
   if(.plot){
-    message("plotting now")
-
-
     hm <- df_plot %>%
       ggplot2::ggplot(ggplot2::aes(x = SAMPLE,
-                 y = params,
-                 fill = val))+
+                                   y = params,
+                                   fill = val))+
       ggplot2::geom_tile()+
       {if(outlier.removal | (is.numeric(custom_threshold) & norm_method == "zscore"))
         ggplot2::scale_fill_gradient2(high = color_code[1], low = color_code[2],
-                             breaks = fill_labels,
-                             labels = fill_names)
+                                      breaks = fill_labels,
+                                      labels = fill_names)
         else
           ggplot2::scale_fill_gradient2(high = color_code[1], low = color_code[2])}+
       ggplot2::scale_x_discrete(position = "top")+
       ggplot2::theme_void()+
       ggplot2::theme(axis.title.x = ggplot2::element_blank(),
-            axis.title.y = ggplot2::element_blank(),
-            axis.ticks.y = ggplot2::element_blank(),
-            axis.text.x = ggplot2::element_text(hjust = 1, angle = 90),
-            axis.text.y = ggplot2::element_text(),
-            legend.position = "right")+
+                     axis.title.y = ggplot2::element_blank(),
+                     axis.ticks.y = ggplot2::element_blank(),
+                     axis.text.x = ggplot2::element_text(hjust = 1, angle = 90),
+                     axis.text.y = ggplot2::element_text(),
+                     legend.position = "right")+
       {if(length(unique(df_plot$params)) > 100)
         ggplot2::theme(axis.text.y = ggplot2::element_blank())}+
       {if(!show_param_names)
         ggplot2::theme(axis.text.y = ggplot2::element_blank())}+
       {if(!show_sample_names)
         ggplot2::theme(axis.text.x = ggplot2::element_blank(),
-              axis.ticks.x = ggplot2::element_blank())
+                       axis.ticks.x = ggplot2::element_blank())
         else if(length(unique(df_plot$SAMPLE)) > 50)
           ggplot2::theme(axis.text.x = ggplot2::element_blank())}+
       {if(norm_method == "zscore") ggplot2::labs(fill = "z-score norm.\nmRNA expression")}+
       {if(norm_method == "max") ggplot2::labs(fill = "Maximum scaled\nmRNA expression")}+
       {if(hide_legend) ggplot2::theme(legend.position = "none")}
-
-
-
+    
+    
     if(add_annotation){
-      message("adding annotation")
-
       hm <- hm +
         ggplot2::theme(axis.text.x = ggplot2::element_blank(),
-              axis.ticks.x = ggplot2::element_blank())
+                       axis.ticks.x = ggplot2::element_blank())
       plot_list <- list(hm)
-
-
+      
       if(length(anno_col) > 1){
         if(!all(anno_col %in% colnames(df_plot))){
           stop("not all supplied columns are in the data frame")
@@ -277,7 +223,7 @@ simpleHM <- function(df,
         anno_cols <- df_plot %>%
           dplyr::select(-c(SAMPLE, params, val)) %>% names()
       }
-
+      
       for(col in 1:length(anno_cols)){
         anno <- df_plot %>%
           ggplot2::ggplot(ggplot2::aes_string(y = 1, x = "SAMPLE", fill = anno_cols[col])) +
@@ -291,12 +237,9 @@ simpleHM <- function(df,
       }
       
       
-      
       if(return_list) {
         return(plot_list)
       }
-      
-      message("wrapping plots up")
       plot <- patchwork::wrap_plots(plot_list, heights = c(rep(0.05, length(anno_cols)), 1), ncol = 1, guides = "collect")
       
       if(add_dendros){
@@ -319,7 +262,6 @@ simpleHM <- function(df,
                                       widths = c(0.5, 1), ncol = 2, byrow = F, guides = "collect")
         
         return(plot)
-        ##stuff
       }
       
       

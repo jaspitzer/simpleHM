@@ -84,7 +84,7 @@ p4 <- simpleHM(df, excluded_vars = "batch", add_dendros = T, pull_side = c("var1
 combined_plots1 <- wrap_plots(list(p1, p2), ncol = 2)
 combined_plots2 <- wrap_plots(list(p3, p4), ncol = 2)
 
-combined_plots1
+combined_plots1 
 combined_plots2
 ```
 

@@ -44,49 +44,19 @@ simpleAnno <- function(df,
                     id_col = "", # column identifying each sample, defaults to first colum if empty)
                     anno_col = "", # which columns contains annotations, defaults to everything but the identifier or the not excluded numeric columns
                     annotation_colors = list()){
-  df_input <- df
+  df_input <- df %>% 
+    {if(nchar(id_col) > 0) dplyr::rename(.,"SAMPLE" = id_col)  else dplyr::rename(.,"SAMPLE" = 1)}
   
   if(normalise_params) { #normalise params
-    df_input <- df_input %>%
-      {if(norm_method == "zscore")
-        dplyr::mutate(., dplyr::across(.cols = dplyr::where(is.numeric) & !excluded_vars, scale))
-        else .} %>%
-      {if(norm_method == "max")
-        dplyr::mutate(., dplyr::across(.cols = dplyr::where(is.numeric) & !excluded_vars,
-                                       function(x){(x-min(x))/(max(x)-min(x))}))
-        else .}
-    
-    
+    df_input <- normalise.params(df_input, norm_method, excluded_vars)
   }
+  
   if(normalise_samples){ #normalize samples
-    df_input <- df_input %>%
-      tidyr::pivot_longer(cols = dplyr::where(is.numeric) & !excluded_vars,
-                          names_to = "params",
-                          values_to = "val") %>%
-      tidyr::pivot_wider(names_from = ifelse(nchar(id_col) > 0, id_col, names(df)[1]),
-                         values_from = "val") %>%
-      {if(norm_method == "zscore")
-        dplyr::mutate(., dplyr::across(.cols = dplyr::where(is.numeric) & !excluded_vars, scale))
-        else .} %>%
-      {if(norm_method == "max")
-        dplyr::mutate(., dplyr::across(.cols = dplyr::where(is.numeric) & !excluded_vars,
-                                       function(x){(x-min(x))/(max(x)-min(x))}))
-        else .} %>%
-      tidyr::pivot_longer(cols = dplyr::where(is.numeric) & !excluded_vars,
-                          names_to = ifelse(nchar(id_col) > 0, id_col, names(df)[1]),
-                          values_to = "val") %>%
-      tidyr::pivot_wider(names_from = "params", values_from = "val")
+    df_input <- normalise.samples(df_input, norm_method, excluded_vars)
   }
-  message("normalisation done")
+  
   if(clust_samples){
-    samples_clust <- df_input %>% 
-      {if(length(excluded_vars) >0)
-        dplyr::select(., -tidyselect::any_of(excluded_vars))
-        else .} %>% 
-      tibble::column_to_rownames(ifelse(nchar(id_col) > 0, id_col, names(df)[1])) %>% 
-      dplyr::select(tidyselect::where(base::is.numeric)) %>% 
-      stats::dist() %>% 
-      stats::hclust()
+    samples_clust <- clust.samples(df_input, excluded_vars)
     
     order_samples <- samples_clust$labels[samples_clust$order]
     if(!is.null(pull_top)){
@@ -99,22 +69,10 @@ simpleAnno <- function(df,
         samples_clust <- dendextend::rotate(samples_clust, order_samples)
       }
     }
-    
-    message("clustering samples done")
   }
   
-  
   if(clust_params){
-    params_clust <- df_input %>% 
-      {if(length(excluded_vars) >0)
-        dplyr::select(., -tidyselect::any_of(excluded_vars))
-        else .} %>% 
-      tibble::column_to_rownames(ifelse(nchar(id_col) > 0, id_col, names(df)[1])) %>% 
-      dplyr::select(tidyselect::where(is.numeric)) %>% 
-      t() %>% 
-      stats::dist() %>% 
-      stats::hclust()
-    
+    params_clust <- clust.params(df_input, excluded_vars)
     order_params <- params_clust$labels[params_clust$order]
     
     if(!is.null(pull_side)){
@@ -127,7 +85,6 @@ simpleAnno <- function(df,
         params_clust <- dendextend::rotate(params_clust, order_params)
       }
     }
-    message("clustering params done")
   }
   
   
