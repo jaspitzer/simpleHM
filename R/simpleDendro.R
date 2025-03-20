@@ -96,6 +96,7 @@ simpleDendro <- function(df,
     return(clust_list)
   }
   suppressMessages(p_top_denro <- ggdendro::ggdendrogram(samples_clust)+
+                     ggplot2::scale_x_discrete(breaks = seq(from = 0, to = 1, length.out = length(order_samples)), labels = rep("", length(order_samples)))+
                      ggplot2::theme_void())
   suppressMessages(p_side_denro <- ggdendro::ggdendrogram(params_clust, rotate = T)+
                      ggplot2::scale_y_reverse()+

@@ -258,8 +258,8 @@ simpleHM <- function(df,
           plot_list <- purrr::prepend(plot_list, list(p_space))
         }
         plot <- patchwork::wrap_plots(plot_list, 
-                                      heights = c(0.5, rep(0.05, length(anno_cols)), 1),
-                                      widths = c(0.5, 1), ncol = 2, byrow = F, guides = "collect")
+                                      heights = c(0.2, rep(0.05, length(anno_cols)), 1),
+                                      widths = c(0.2, 1), ncol = 2, byrow = F, guides = "collect")
         
         return(plot)
       }
@@ -270,6 +270,7 @@ simpleHM <- function(df,
       if(add_dendros){
         plot_list <- list(hm)
         suppressMessages(p_top_denro <- ggdendro::ggdendrogram(samples_clust)+
+                           ggplot2::scale_x_discrete(breaks = seq(from = 0, to = 1, length.out = length(order_samples)), labels = rep("", length(order_samples)))+
                            ggplot2::theme_void())
         suppressMessages(p_side_denro <- ggdendro::ggdendrogram(params_clust, rotate = T)+
                            ggplot2::scale_y_reverse()+
@@ -283,8 +284,8 @@ simpleHM <- function(df,
         plot_list <- purrr::prepend(plot_list, list(p_space))
         
         plot <- patchwork::wrap_plots(plot_list, 
-                                      heights = c(0.5, 1),
-                                      widths = c(0.5, 1), ncol = 2, byrow = F, guides = "collect")
+                                      heights = c(0.2, 1),
+                                      widths = c(0.2, 1), ncol = 2, byrow = F, guides = "collect")
         
         return(plot)
         ##stuff
