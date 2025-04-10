@@ -3,6 +3,7 @@
 #' @param df a dataframe to containing the data to be plotted. Required
 #' @param clust_samples  should the samples be clustered? T/F
 #' @param clust_params should the variables be clustered? T/F
+#' @param force_symetric_rows should the rows be clustered same as the columns? T/F
 #' @param param_order can be used to suplly a vector containg a custom order for the variables. Ignored if clust_params = TRUE
 #' @param linkage which linkage method to use. defaults
 #' @param pull_top should the dendrogram be rotated? if yes, what levels should be pulled to the front? Accepts numeric values (current order) and variable names
@@ -46,6 +47,7 @@ simpleHM <- function(df,
                      
                      clust_samples = T, # should the samples (columns)  be clustered
                      clust_params = T, # should the parameters (rows) be clustered
+                     force_symetric_rows = F, # should the rows be clustered same as the columns
                      param_order = NULL, # if the parameters are not clustered, you can supply a custom order
                      linkage = "complete", #what linkage method for clustering
                      pull_top = NULL,
@@ -103,7 +105,7 @@ simpleHM <- function(df,
   }
   
   
-  if(clust_params){
+  if(clust_params & !force_symetric_rows){
     params_clust <- clust.params(df_input, excluded_vars)
     order_params <- params_clust$labels[params_clust$order]
     
@@ -118,8 +120,10 @@ simpleHM <- function(df,
       }
     }
   }
-  
-  
+  if(force_symetric_rows){
+    order_params <- order_samples
+    params_clust <- samples_clust
+  }
   
   
   if(is.numeric(custom_threshold) & norm_method == "zscore"){

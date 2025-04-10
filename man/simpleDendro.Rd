@@ -8,6 +8,7 @@ simpleDendro(
   df,
   clust_samples = T,
   clust_params = T,
+  force_symetric_rows = F,
   param_order = NULL,
   linkage = "complete",
   pull_top = NULL,
@@ -26,6 +27,8 @@ simpleDendro(
 \item{clust_samples}{should the samples be clustered? T/F}
 
 \item{clust_params}{should the variables be clustered? T/F}
+
+\item{force_symetric_rows}{should the rows be clustered same as the columns? T/F}
 
 \item{param_order}{can be used to suplly a vector containg a custom order for the variables. Ignored if clust_params = TRUE}
 
