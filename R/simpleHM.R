@@ -14,6 +14,7 @@
 #' @param normalise_params should the variables be normalized? defaults to T
 #' @param normalise_samples should normalisation be applied to samples? defaults to F
 #' @param norm_method which method should be applied to normalise? can be min/max scaling or z-score; T/F
+#' @param scale_name Custom name for the fill scale
 #' @param excluded_vars character vector of variabels to be excluded
 #' @param id_col a character with id column clearly identifying each sample
 #' @param color_code color code for the fill aestethic. default is "#FF1c00" for high values and "darkblue" for low values
@@ -68,6 +69,7 @@ simpleHM <- function(df,
                      custom_threshold = NULL, #custom threshold for z-score
                      outlier.removal = T, # should the zscore be cleared of outliers (outliers are set to the percentile detailed below)
                      outlier.threshold = 0.95, # want percentile of z-scores should be trimmed
+                     scale_name = NULL,
                      
                      add_annotation = F, # should color bar annotation be included?
                      anno_col = "", # which columns contains annotations, defaults to everything but the identifier or the not excluded numeric columns
@@ -209,6 +211,7 @@ simpleHM <- function(df,
           ggplot2::theme(axis.text.x = ggplot2::element_blank())}+
       {if(norm_method == "zscore") ggplot2::labs(fill = "z-score norm.\nmRNA expression")}+
       {if(norm_method == "max") ggplot2::labs(fill = "Maximum scaled\nmRNA expression")}+
+      {if(!is.null(scale_name)) ggplot2::labs(fill = scale_name)}+
       {if(hide_legend) ggplot2::theme(legend.position = "none")}
     
     

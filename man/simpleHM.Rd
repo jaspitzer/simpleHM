@@ -25,6 +25,7 @@ simpleHM(
   custom_threshold = NULL,
   outlier.removal = T,
   outlier.threshold = 0.95,
+  scale_name = NULL,
   add_annotation = F,
   anno_col = "",
   annotation_colors = list(),
@@ -73,6 +74,8 @@ simpleHM(
 \item{outlier.removal}{should outlier be removed? i.e. single values which drive the normalized values; default is T}
 
 \item{outlier.threshold}{threshold for outlier.removal. currently is set to the 95th percentile (0.95)}
+
+\item{scale_name}{Custom name for the fill scale}
 
 \item{add_annotation}{should annotation be added to the heatmap? default = F}
 
