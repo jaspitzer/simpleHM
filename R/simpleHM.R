@@ -221,7 +221,7 @@ simpleHM <- function(df,
                        axis.ticks.x = ggplot2::element_blank())
       plot_list <- list(hm)
       
-      if(length(anno_col) > 1){
+      if(length(anno_col) > 1 || stringr::str_length(anno_col)>0){
         if(!all(anno_col %in% colnames(df_plot))){
           stop("not all supplied columns are in the data frame")
         }

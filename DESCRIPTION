@@ -20,6 +20,7 @@ Imports:
     magrittr,
     patchwork,
     purrr,
+    stringr,
     tibble,
     tidyr,
     tidyselect
