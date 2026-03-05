@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Spitzer
+    given-names: Jasper
+    orcid: https://orcid.org/0000-0001-9696-2092
+title: "simleHM"
+version: 0.0.3
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.18874705
+date-released: 2021-08-11
